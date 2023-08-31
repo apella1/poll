@@ -1,0 +1,11 @@
+<!-- for simplicity, half html files are used -->
+<!-- for full projects entire html documents should be used -->
+{% if lastest_question_list %}
+<ul>
+  {% for quesstion in lastest_question_list %}
+  <li><a href="/polls/{{question.id}}/">{{quesstion.question_text}}</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No polls are available</p>
+{% endif %}

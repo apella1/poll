@@ -1,65 +1,54 @@
 """
 Views for the polls app
 """
-
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views import generic
 
 # from django.http import Http404
 # from django.template import loader
-from .models import Question, Choice
+from .models import Choice, Question
 
 
-def index(request):
+class IndexView(generic.ListView):
     """_summary_
 
     Args:
-        request (_type_): _description_
+        generic (_type_): _description_
 
     Returns:
         _type_: _description_
     """
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    # using loader
-    # template = loader.get_template("polls/index.html")
-    # context variable remains
-    context = {"latest_question_list": latest_question_list}
-    # return HttpResponse(template.render(context, request))
-    return render(request, "polls/index.html", context)
+
+    template_name: str = "polls/index.html"
+    context_object_name: str = "latest_question_list"
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by("-pub_date")[:5]
 
 
-def detail(request, question_id):
+class DetailView(generic.DetailView):
     """_summary_
 
     Args:
-        request (_type_): _description_
-        question_id (_type_): _description_
-
-    Returns:
-        _type_: _description_
+        generic (_type_): _description_
     """
-    # try:
-    #     question = Question.objects.get(pk=question_id)
-    # except Question.DoesNotExist:
-    #     raise Http404("Question does not exist")
-    # using a shortcut for the above code
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/detail.html", {"question": question})
+
+    model = Question
+    template_name = "polls/detail.html"
 
 
-def results(request, question_id):
+class ResultsView(generic.DetailView):
     """_summary_
 
     Args:
-        request (_type_): _description_
-        question_id (_type_): _description_
-
-    Returns:
-        _type_: _description_
+        generic (_type_): _description_
     """
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/results.html", {"question": question})
+
+    model = Question
+    template_name = "polls/results.html"
 
 
 def vote(request, question_id):

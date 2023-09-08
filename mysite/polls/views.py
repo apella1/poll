@@ -30,7 +30,9 @@ class IndexView(generic.ListView):
         Return the last five published questions.
         Not including those set to be published in the future.
         """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by(
+            "-pub_date"
+        )[:5]
 
 
 class DetailView(generic.DetailView):
@@ -62,26 +64,34 @@ class ResultsView(generic.DetailView):
 
 
 def vote(request, question_id):
-    """_summary_
+    """Voting on a particular question and selecting the available options
 
     Args:
         request (_type_): _description_
-        question_id (_type_): _description_
+        question_id (int): id of the current question
 
     Returns:
         _type_: _description_
     """
     question = get_object_or_404(Question, pk=question_id)
     try:
-        question.choice_set.get(pk=request.POST["choice"])
+        selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
         # Re-displaying question form
-        return render(request, "polls/detail.html",
-                      {"question": question, "error_message": "You did not select a choice"}, )
+        return render(
+            request,
+            "polls/detail.html",
+            {
+                "question": question,
+                "error_message": "You did not select a choice"
+            },
+        )
     else:
         selected_choice.votes += 1
         selected_choice.save()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice
         # should a user press the back button
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id)))
+        return HttpResponseRedirect(
+            reverse("polls:results", args=(question.id,))
+            )

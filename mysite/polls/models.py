@@ -3,6 +3,7 @@ Polls models
 """
 import datetime
 
+from django.contrib import admin
 from django.db import models
 from django.utils import timezone
 
@@ -23,10 +24,15 @@ class Question(models.Model):
     # but also because objects’ representations are used
     # throughout Django’s automatically-generated admin.
     def __str__(self):
-        return self.question_text
+        return str(self.question_text)
 
+    @admin.display(
+        boolean=True,
+        ordering="pub_date",
+        description="Published recently?"
+        )
     def was_published_recently(self):
-        """ returns True is a question was published within the last one day
+        """returns True if a question was published within the last one day
 
         Returns:
             _type_: _description_
@@ -47,4 +53,4 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.choice_text
+        return str(self.choice_text)
